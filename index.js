@@ -3,6 +3,9 @@
 const express = require('express');
 const mongoose = require('mongoose');  //mongodb orm
 const bodyParser = require('body-parser');
+const methodOverrid = require('method-override');
+const req = require('express/lib/request');
+const res = require('express/lib/response');
 const app = express();
 const port = 3000;
 
@@ -27,6 +30,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(methodOverrid('_method'));  //_method의 query로 들어오는 값으로 HTTP method를 바꿈
 
 
 //==DB schema==//
@@ -58,6 +62,30 @@ app.post('/contacts', (req, res) => {  //create
         res.redirect('/contacts');
     });
 })
+app.get('/contacts/:id', (req, res) => {  //show
+    Contact.findOne({_id:req.params.id}, (err, contact) => {
+        if(err) return res.json(err);
+        res.render('contacts/show', {contact:contact});
+    });
+});
+app.get('/contacts/:id/edit', (req, res) => {  //edit
+    Contact.findOne({_id:req.params.id}, (err, contact) => {
+        if(err) return res.json(err);
+        res.render('contacts/edit', {contact:contact});
+    });
+});
+app.put('/contacts/:id', (req, res) => {  //update
+    Contact.findOneAndUpdate({_id:req.params.id}, req.body, (err, contact) => {
+        if(err) return res.json(err);
+        res.redirect('/contacts/' + req.params.id);
+    });
+});
+app.delete('/contacts/:id', (req, res) => {
+    Contact.deleteOne({_id:req.params.id}, (err) => {
+        if(err) return res.json(err);
+        res.redirect('/contacts');
+    });
+});
 
 app.listen(port, () => {
   console.log('server on! http://localhost:'+port);
