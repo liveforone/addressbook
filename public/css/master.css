@@ -1,5 +1,9 @@
+.contact .contact-form,
+.contact-index ul{
+  max-width: 500px;
+}
 .contact h2{
-    color: tomato;
+  color: tomato;
 }
 .contact .contact-form label,
 .contact-show label{
